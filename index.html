@@ -1,15 +1,515 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>hello my dog</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数据输入界面</title>
+  <style>
+    :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --background-color: #f8f9fa;
+        --border-color: #e9ecef;
+        --text-color: #212529;
+        --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+        --radius-sm: 8px;
+        --radius-md: 12px;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background-color: var(--background-color);
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+
+    .container {
+        width: 90%;
+        max-width: 800px;
+        margin: 30px auto;
+        background: white;
+        padding: 30px;
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+    }
+
+    h3 {
+        color: var(--text-color);
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    textarea {
+        width: 100%;
+        padding: 15px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-family: inherit;
+        font-size: 14px;
+        resize: vertical;
+        transition: all 0.3s ease;
+    }
+
+    textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .question {
+        margin-bottom: 20px;
+        background: white;
+        padding: 20px;
+        border-radius: var(--radius-sm);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .question label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+
+    .input-group {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .question input[type="text"] {
+        flex: 1;
+        padding: 12px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        font-size: 14px;
+        transition: all 0.3s ease;
+    }
+
+    .question input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .question input[type="text"]:disabled {
+        background-color: var(--background-color);
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        margin-left: 10px;
+        accent-color: var(--primary-color);
+    }
+
+    button {
+        padding: 12px 24px;
+        margin-top: 20px;
+        border: none;
+        background-color: var(--primary-color);
+        color: white;
+        cursor: pointer;
+        border-radius: var(--radius-sm);
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    button:hover {
+        background-color: var(--secondary-color);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    button:active {
+        transform: translateY(0);
+    }
+
+    #output {
+        margin-top: 20px;
+        padding: 20px;
+        background: white;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-color);
+        white-space: pre-wrap;
+        font-family: monospace;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    /* 添加响应式设计 */
+    @media (max-width: 768px) {
+        .container {
+            width: 95%;
+            padding: 20px;
+        }
+        
+        .question {
+            padding: 15px;
+        }
+        
+        button {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+    }
+
+    .drawer {
+        margin-bottom: 20px;
+        border-radius: var(--radius-sm);
+        background: white;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .drawer-header {
+        padding: 15px 20px;
+        background-color: var(--background-color);
+        border-radius: var(--radius-sm);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s ease;
+    }
+
+    .drawer-header:hover {
+        background-color: #e9ecef;
+    }
+
+    .drawer-header h3 {
+        margin: 0;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .drawer-content {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        padding: 0 20px;
+    }
+
+    .drawer.open .drawer-content {
+        max-height: 500px; /* 根据内容调整合适的高度 */
+        padding: 20px;
+    }
+
+    .drawer-icon {
+        transition: transform 0.3s ease;
+    }
+
+    .drawer.open .drawer-icon {
+        transform: rotate(180deg);
+    }
+  </style>
 </head>
 <body>
-    <title>
-        use en?;
-    </title>
-    But I don't know en lol o.o!
+  <div class="container">
+    <div class="drawer open" id="step1Drawer">
+        <div class="drawer-header" onclick="toggleDrawer('step1Drawer')">
+            <h3>输入问题定义（每行格式为 "显示名称: 变量名"）</h3>
+            <span class="drawer-icon">▼</span>
+        </div>
+        <div class="drawer-content">
+            <textarea id="questionDefinition" style="width: 100%; height: 150px;">姓名: user_name
+年龄: user_age
+手机号码: phone_number
+家庭住址: home_address</textarea>
+            <button onclick="generateForm()">生成表单</button>
+        </div>
+    </div>
+
+    <div class="drawer open" id="step2Drawer">
+        <div class="drawer-header" onclick="toggleDrawer('step2Drawer')">
+            <h3>输入输出模板（使用 {变量名} 作为占位符）</h3>
+            <span class="drawer-icon">▼</span>
+        </div>
+        <div class="drawer-content">
+            <textarea id="outputDefinition" style="width: 100%; height: 150px;">个人信息表：
+姓名：{user_name}
+年龄：{user_age}岁
+联系方式：{phone_number}
+住址：{home_address}</textarea>
+        </div>
+    </div>
+
+    <form id="data-form">
+        <!-- Questions will be loaded here by JavaScript -->
+    </form>
+    <button onclick="printData()">格式化输出数据</button>
+    <button id="copyButton">点击复制格式化数据（先点击格式化输出）</button>
+  </div>
+
+  <div class="container">
+    <form action="">
+    <div id="output" style="white-space: pre-wrap;"></div>
+    </form>
+  </div>
+
+
+
+
+  <script>
+    // 解析问题定义文本
+    function parseQuestionDefinition(text) {
+        const lines = text.trim().split('\n');
+        const questionData = {};
+        lines.forEach(line => {
+            const [key, value] = line.split(':').map(s => s.trim());
+            if (key && value) {
+                questionData[key] = value;
+            }
+        });
+        return questionData;
+    }
+
+    // 生成表单
+    function generateForm() {
+        const definitionText = document.getElementById('questionDefinition').value;
+        const questionData = parseQuestionDefinition(definitionText);
+        
+        const form = document.getElementById('data-form');
+        form.innerHTML = ''; // 清空现有表单
+        
+        for (const key in questionData) {
+            const questionDiv = document.createElement('div');
+            questionDiv.classList.add('question');
+
+            // 创建label
+            const label = document.createElement('label');
+            label.textContent = key;
+            label.htmlFor = questionData[key];
+
+            // 创建输入组
+            const inputGroup = document.createElement('div');
+            inputGroup.classList.add('input-group');
+
+            // 创建输入框
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = questionData[key];
+            input.id = questionData[key];
+
+            // 恢复保存的值
+            const savedValue = localStorage.getItem(input.id);
+            if (savedValue) {
+                input.value = savedValue;
+            }
+
+            // 创建勾选框（替换原来的开关代码）
+            const checkboxWrapper = document.createElement('div');
+            checkboxWrapper.classList.add('checkbox-wrapper');
+            
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+
+            // 从 localStorage 恢复勾选框状态
+            const checkboxState = localStorage.getItem(input.id + '_checkbox');
+            checkbox.checked = checkboxState === null ? true : checkboxState === 'true';
+
+            // 根据恢复的勾选框状态设置输入框状态
+            input.disabled = !checkbox.checked;
+            if (!checkbox.checked) {
+                input.style.opacity = '0.6';
+                input.style.transform = 'scale(0.98)';
+            }
+
+            // 修改勾选框的事件监听器
+            checkbox.addEventListener('change', function() {
+                const input = this.closest('.input-group').querySelector('input[type="text"]');
+                
+                // 保存勾选框状态到 localStorage
+                localStorage.setItem(input.id + '_checkbox', this.checked);
+                
+                if (!this.checked) {
+                    // 仅禁用输入框，保留当前值
+                    input.disabled = true;
+                    
+                    // 添加禁用动画效果
+                    input.animate([
+                        { transform: 'scale(1)', opacity: 1 },
+                        { transform: 'scale(0.98)', opacity: 0.6 }
+                    ], {
+                        duration: 200,
+                        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+                        fill: 'forwards'
+                    });
+                } else {
+                    // 启用输入框
+                    input.disabled = false;
+                    
+                    // 添加启用动画效果
+                    input.animate([
+                        { transform: 'scale(0.98)', opacity: 0.6 },
+                        { transform: 'scale(1)', opacity: 1 }
+                    ], {
+                        duration: 200,
+                        easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+                    });
+                }
+            });
+
+            input.addEventListener('input', function() {
+                localStorage.setItem(this.id, this.value);
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault(); // 阻止默认的回车键行为
+                    
+                    // 获取所有未禁用的输入框
+                    const allInputs = Array.from(document.querySelectorAll('#data-form input[type="text"]:not([disabled])'));
+                    const currentIndex = allInputs.indexOf(this);
+                    
+                    // 如果存在下一个输入框，则将焦点转移到它
+                    if (currentIndex < allInputs.length - 1) {
+                        allInputs[currentIndex + 1].focus();
+                    }
+                }
+            });
+
+            // 组装组件（修改这部分）
+            checkboxWrapper.appendChild(checkbox);
+            inputGroup.appendChild(input);
+            inputGroup.appendChild(checkboxWrapper);
+            questionDiv.appendChild(label);
+            questionDiv.appendChild(inputGroup);
+            form.appendChild(questionDiv);
+        }
+    }
+
+    function printData() {
+        const form = document.getElementById('data-form');
+        const formData = new FormData(form);
+        const answers = {};
+        const definitionText = document.getElementById('questionDefinition').value;
+        const questionData = parseQuestionDefinition(definitionText);
+
+        for (const key in questionData) {
+            const input = document.getElementById(questionData[key]);
+            if (input) {
+                answers[questionData[key]] = input.value;
+            }
+        }
+
+        const outputTemplate = document.getElementById('outputDefinition').value;
+        const output = formatOutput(outputTemplate, answers);
+        document.getElementById('output').textContent = output;
+    }
+
+    // 页面加载时自动生成表单
+    document.addEventListener('DOMContentLoaded', function() {
+        // 恢复问题定义内容
+        const savedQuestionDef = localStorage.getItem('questionDefinition');
+        if (savedQuestionDef) {
+            document.getElementById('questionDefinition').value = savedQuestionDef;
+        }
+        
+        // 恢复输出模板内容
+        const savedOutputDef = localStorage.getItem('outputDefinition');
+        if (savedOutputDef) {
+            document.getElementById('outputDefinition').value = savedOutputDef;
+        }
+        
+        // 生成表单
+        generateForm();
+        
+        // 恢复抽屉状态
+        ['step1Drawer', 'step2Drawer'].forEach(drawerId => {
+            const drawerState = localStorage.getItem(drawerId + '_state');
+            const drawer = document.getElementById(drawerId);
+            if (drawerState === 'true') {
+                drawer.classList.add('open');
+            } else if (drawerState === 'false') {
+                drawer.classList.remove('open');
+            }
+            // 如果没有保存的状态，保持默认打开状态
+        });
+    });
+
+    // Helper function to replace placeholders with actual data
+    function formatOutput(template, data) {
+        // 获取问题定义文本并解析
+        const definitionText = document.getElementById('questionDefinition').value;
+        const questionData = parseQuestionDefinition(definitionText);
+        
+        // 创建变量名到显示名称的映射
+        const varToDisplayMap = {};
+        for (const [display, varName] of Object.entries(questionData)) {
+            varToDisplayMap[varName] = display;
+        }
+        
+        // 替换模板中的占位符
+        let output = template;
+        for (const [varName, value] of Object.entries(data)) {
+            const regex = new RegExp(`{${varName}}`, 'g');
+            output = output.replace(regex, value || '');
+        }
+        
+        return output;
+    }
+
+    // 这是第三种备用方法用于非https连接中的文本连带格式复制
+    document.getElementById('copyButton').addEventListener('click', function() {
+        const outputText = document.getElementById('output').textContent;
+
+        // 使用textarea而不是input，因为对于多行文本来说这更可靠
+        const textArea = document.createElement('textarea');
+        textArea.value = outputText;
+        textArea.style.position = 'fixed';  // 避免在屏幕上出现滚动
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        try {
+            // 尝试执行复制操作
+            const successful = document.execCommand('copy');
+            const msg = successful ? '成功' : '失败';
+            console.log('复制文本' + msg);
+            alert('复制' + msg + '！');
+        } catch (err) {
+            console.error('无法复制文本', err);
+            alert('复制失败！');
+        }
+
+        // 清理完成后从DOM中移除textarea
+        document.body.removeChild(textArea);
+    });
+
+    // 添加问题定义和输出模板的变化监听器
+    document.getElementById('questionDefinition').addEventListener('input', function() {
+        localStorage.setItem('questionDefinition', this.value);
+    });
+
+    document.getElementById('outputDefinition').addEventListener('input', function() {
+        localStorage.setItem('outputDefinition', this.value);
+    });
+
+    // 在 script 标签中添加抽屉控制函数
+    function toggleDrawer(drawerId) {
+        const drawer = document.getElementById(drawerId);
+        const isOpen = drawer.classList.contains('open');
+        
+        // 添加动画效果
+        if (isOpen) {
+            drawer.classList.remove('open');
+        } else {
+            drawer.classList.add('open');
+        }
+
+        // 保存抽屉状态到 localStorage
+        localStorage.setItem(drawerId + '_state', !isOpen);
+    }
+
+  </script>
+
 </body>
 </html>
